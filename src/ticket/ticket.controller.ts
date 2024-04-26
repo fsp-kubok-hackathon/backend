@@ -1,7 +1,9 @@
 import {
   Body,
   Controller,
+  Get,
   Logger,
+  Param,
   Post,
   UploadedFiles,
   UseInterceptors,
@@ -16,16 +18,21 @@ import { AnyFilesInterceptor } from '@nestjs/platform-express';
 import { RequiredAuth } from 'src/auth/decorators/auth.decorator';
 import { User } from 'src/auth/decorators/user.decorator';
 import { CreateTicketDto } from './dto/create-ticket.dto';
+import { UserReciept } from 'src/reciept/dto/reciept.dto';
+import { RecieptService } from 'src/reciept/reciept.service';
 
 @ApiTags('Тикет')
 @Controller('tickets')
 export class TicketController {
   private readonly logger = new Logger(TicketController.name);
 
-  constructor(private readonly service: TicketService) {}
+  constructor(
+    private readonly service: TicketService,
+    private readonly recieptService: RecieptService,
+  ) {}
 
   @Post('/upload')
-  @ApiOperation({ summary: 'Загрузка фотографии чека' })
+  @ApiOperation({ summary: 'Загрузка фотографии чеков для тикета' })
   @RequiredAuth('EMPLOYEE')
   @UsePipes(new ValidationPipe())
   @UseInterceptors(AnyFilesInterceptor())
@@ -35,12 +42,14 @@ export class TicketController {
     @Body() { endDate, startDate }: CreateTicketDto,
     @User() user: UserClaims,
   ) {
-    const created = await this.service.upload(
-      user.id,
-      files,
-      startDate,
-      endDate,
-    );
-    // return { created };
+    return await this.service.upload(user.id, files, startDate, endDate);
+  }
+
+  @Get('/:id/reciepts')
+  @ApiOperation({ summary: 'Получение чеков по id тикета' })
+  @RequiredAuth()
+  @ApiResponse({ status: 200, type: [UserReciept] })
+  async getReciepts(@Param('id') ticketId: string): Promise<UserReciept[]> {
+    return await this.service.findAllRecieptsById(ticketId);
   }
 }

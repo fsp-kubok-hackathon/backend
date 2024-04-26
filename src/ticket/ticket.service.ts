@@ -1,6 +1,8 @@
 import { Injectable } from '@nestjs/common';
+import { Prisma } from '@prisma/client';
 import { MinioService } from 'src/minio/minio.service';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { UserReciept } from 'src/reciept/dto/reciept.dto';
 import { ReportService } from 'src/report/report.service';
 import { uuidv7 } from 'uuidv7';
 
@@ -10,6 +12,37 @@ export class TicketService {
     private readonly prisma: PrismaService,
     private readonly minio: MinioService,
   ) { }
+
+  async findAll(filter?: Prisma.TicketWhereInput) {
+    return this.prisma.ticket.findMany({ where: filter });
+  }
+
+  async findAllRecieptsById(ticketId: string) {
+    const reciepts = await this.prisma.ticketReciept.findMany({
+      where: { ticketId: ticketId },
+      include: { reciept: true },
+    });
+
+    const items: UserReciept[] = await Promise.all(
+      reciepts.map(async (t) => {
+        const r = t.reciept;
+        const imageLink = await this.minio.getFileUrl(r.imageName);
+        const item: UserReciept = {
+          amount: String(r.amount),
+          fn: String(r.fn),
+          fp: String(r.fp),
+          paidAt: r.paidAt,
+          purpose: r.purpose,
+          imageLink,
+          createdAt: r.createdAt,
+          updatedAt: r.updatedAt,
+        };
+        return item;
+      }),
+    );
+
+    return items;
+  }
 
   async upload(
     userId: string,
@@ -61,5 +94,7 @@ export class TicketService {
         }),
       });
     });
+
+    return { id };
   }
 }

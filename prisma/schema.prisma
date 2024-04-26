@@ -92,24 +92,33 @@ model Reciept {
   @@map("reciepts")
 }
 
+enum TicketStatus {
+  PENDING
+  OK
+  FAILED
+}
+
 model Ticket {
-  id        String    @id
-  userId    String    @map("user_id")
-  startDate DateTime  @map("start_date")
-  endDate   DateTime  @map("end_date")
-  createdAt DateTime  @default(now()) @map("created_at")
-  updatedAt DateTime? @map("updated_at")
+  id        String       @id
+  userId    String       @map("user_id")
+  startDate DateTime     @map("start_date")
+  endDate   DateTime     @map("end_date")
+  status    TicketStatus @default(PENDING)
+  createdAt DateTime     @default(now()) @map("created_at")
+  updatedAt DateTime?    @map("updated_at")
 
   report        Report?         @relation(fields: [reportId], references: [id])
   reportId      String          @unique
+  
   TicketReciept TicketReciept[]
 
   @@map("tickets")
 }
 
 model TicketReciept {
-  ticketId  String @map("ticket_id")
-  recieptId String @map("reciept_id")
+  ticketId  String  @map("ticket_id")
+  recieptId String  @map("reciept_id")
+  reason    String?
 
   ticket  Ticket  @relation(fields: [ticketId], references: [id])
   reciept Reciept @relation(fields: [recieptId], references: [id])

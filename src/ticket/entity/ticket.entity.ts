@@ -1,18 +1,17 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { TicketStatus } from '@prisma/client';
 
-export class UserReciept {
+export class Ticket {
   @ApiProperty()
-  imageLink: string;
+  id: string;
   @ApiProperty()
-  fn: string;
+  userId: string;
   @ApiProperty()
-  fp: string;
+  startDate: Date;
   @ApiProperty()
-  amount: string;
+  endDate: Date;
   @ApiProperty()
-  purpose: string;
-  @ApiProperty()
-  paidAt: Date;
+  status: TicketStatus;
   @ApiProperty()
   createdAt: Date;
   @ApiProperty()

@@ -1,12 +1,16 @@
 import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import { ProfileDto } from 'src/auth/dto/profile.dto';
+import { TicketService } from 'src/ticket/ticket.service';
 import { UsersService } from 'src/users/users.service';
 
 @Injectable()
 export class AccountService {
   private readonly logger = new Logger('AccountService');
 
-  constructor(private readonly usersService: UsersService) {}
+  constructor(
+    private readonly usersService: UsersService,
+    private readonly ticketService: TicketService,
+  ) {}
 
   async profile(id: string): Promise<ProfileDto> {
     const user = await this.usersService.findById(id);
@@ -27,5 +31,9 @@ export class AccountService {
       email: user.email,
       role: user.role,
     };
+  }
+
+  async tickets(userId: string) {
+    return await this.ticketService.findAll({ userId });
   }
 }
