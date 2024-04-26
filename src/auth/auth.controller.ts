@@ -29,6 +29,7 @@ const REFRESH_TOKEN = 'refreshToken';
 const COOKIE_OPTIONS: CookieOptions = {
   httpOnly: true,
   expires: addHours(Number(process.env.JWT_REFRESH_TTL)),
+  sameSite: 'none',
 };
 
 @Controller('auth')
