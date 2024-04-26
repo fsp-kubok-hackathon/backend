@@ -9,6 +9,7 @@ RUN npm ci
 COPY --chown=node:node . .
 
 RUN npm run prisma:generate
+RUN npm run prisma:push
 
 USER node
 
