@@ -27,9 +27,10 @@ import { Role } from '@prisma/client';
 
 const REFRESH_TOKEN = 'refreshToken';
 const COOKIE_OPTIONS: CookieOptions = {
-  httpOnly: true,
+  // httpOnly: true,
   expires: addHours(Number(process.env.JWT_REFRESH_TTL)),
-  sameSite: 'lax',
+  // sameSite: 'none',
+  // secure: false,
   domain: process.env.COOKIE_DOMAIN,
 };
 
