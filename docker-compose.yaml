@@ -8,6 +8,8 @@ services:
       - production.env
     ports:
       - 4200:${APP_PORT}
+    volumes:
+      - modules:/app
     depends_on:
       - postgres
       - redis
@@ -51,3 +53,4 @@ volumes:
   pgdata:
   redisdata:
   miniodata:
+  modules:
