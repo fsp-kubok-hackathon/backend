@@ -1,6 +1,20 @@
 version: '4.5'
 
 services:
+  app:
+    build:
+      context: .
+    env_file:
+      - production.env
+    ports:
+      - 4200:${APP_PORT}
+    depends_on:
+      - postgres
+      - redis
+      - minio
+    restart: always
+    environment:
+      - DATABASE_URL=postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:${POSTGRES_PORT}/kubok?schema=public
   postgres:
     image: postgres:16.2-alpine3.19
     restart: always
