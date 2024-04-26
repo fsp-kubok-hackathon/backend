@@ -30,6 +30,7 @@ const COOKIE_OPTIONS: CookieOptions = {
   httpOnly: true,
   expires: addHours(Number(process.env.JWT_REFRESH_TTL)),
   sameSite: 'none',
+  secure: false,
 };
 
 @Controller('auth')
