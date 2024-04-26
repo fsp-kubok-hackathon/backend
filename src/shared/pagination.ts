@@ -1,9 +1,8 @@
-import { ApiProperty } from "@nestjs/swagger";
+import { ApiProperty } from '@nestjs/swagger';
 
 export default class Pagination {
-    @ApiProperty()
-    offset: number;
-
-    @ApiProperty()
-    limit: number;
+  @ApiProperty()
+  offset: number;
+  @ApiProperty()
+  limit: number;
 }
