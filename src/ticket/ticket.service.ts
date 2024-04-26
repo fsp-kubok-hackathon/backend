@@ -14,8 +14,12 @@ export class TicketService {
   ) {}
 
   async findAll(filter?: Prisma.TicketWhereInput) {
-    // const { limit: skip, offset: take } = pagination;
-    return await this.prisma.ticket.findMany({ where: filter });
+    const tickets = await this.prisma.ticket.findMany({
+      where: filter,
+      include: { report: { include: { addedBy: true } } },
+    });
+
+    return tickets;
   }
 
   async findAllRecieptsById(ticketId: string) {
