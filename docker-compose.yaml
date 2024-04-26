@@ -5,11 +5,10 @@ services:
     build:
       context: .
     env_file:
-      - .env
+      - production.env
     ports:
       - 4200:${APP_PORT}
     volumes:
-      - modules:/app
       - ./prisma:/app/prisma
       - ./wait:/app/wait
     depends_on:
@@ -55,4 +54,3 @@ volumes:
   pgdata:
   redisdata:
   miniodata:
-  modules:
