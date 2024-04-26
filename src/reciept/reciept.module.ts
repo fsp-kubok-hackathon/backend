@@ -8,6 +8,7 @@ import { RecieptController } from './reciept.controller';
 @Module({
   controllers: [RecieptController],
   providers: [RecieptService],
+  exports: [RecieptService],
   imports: [PrismaModule, MinioModule, JwtModule],
 })
 export class RecieptModule {}
