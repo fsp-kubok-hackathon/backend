@@ -27,6 +27,7 @@ model User {
   updatedAt DateTime? @map("updated_at")
   reciepts  Reciept[]
   reports   Report[]
+  Ticket    Ticket[]
 
   @@map("users")
 }
@@ -114,6 +115,8 @@ model Ticket {
   report        Report?         @relation(fields: [reportId], references: [id])
   reportId      String?         @unique
   TicketReciept TicketReciept[]
+
+  user User @relation(fields: [userId], references: [id])
 
   @@map("tickets")
 }

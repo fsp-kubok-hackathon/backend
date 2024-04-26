@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { MinioService } from 'src/minio/minio.service';
 import { PrismaService } from 'src/prisma/prisma.service';
@@ -8,6 +8,8 @@ import { Ticket } from './entity/ticket.entity';
 
 @Injectable()
 export class TicketService {
+  private readonly logger = new Logger('TicketService');
+
   constructor(
     private readonly prisma: PrismaService,
     private readonly minio: MinioService,
@@ -55,6 +57,7 @@ export class TicketService {
         const ticket = await tx.ticket.findFirstOrThrow({
           where: { id: ticketId },
           include: {
+            user: true,
             report: {
               include: {
                 addedBy: true,
@@ -63,7 +66,7 @@ export class TicketService {
           },
         });
 
-        return {
+        const t = {
           id: ticket.id,
           createdAt: ticket.createdAt,
           updatedAt: ticket.updatedAt,
@@ -71,13 +74,19 @@ export class TicketService {
           startDate: ticket.startDate,
           status: ticket.status,
           userId: ticket.userId,
+          user: { ...ticket.user },
           report: ticket.report
             ? {
                 ...ticket.report,
               }
             : undefined,
         };
+
+        this.logger.verbose('find ticket by id', t);
+
+        return t;
       } catch (e) {
+        this.logger.error('find ticket by id', e);
         throw new NotFoundException('Тикет не найден' + e);
       }
     });

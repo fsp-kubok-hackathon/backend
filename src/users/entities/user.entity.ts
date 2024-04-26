@@ -5,7 +5,6 @@ export class User {
   lastName: string;
   firstName: string;
   middleName: string;
-  imageLink: string;
   role: string;
   createdAt: Date;
   updatedAt: Date | null;
