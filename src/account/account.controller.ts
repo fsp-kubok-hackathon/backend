@@ -5,6 +5,7 @@ import { ProfileDto } from 'src/auth/dto/profile.dto';
 import { RequiredAuth } from 'src/auth/decorators/auth.decorator';
 import { User } from 'src/auth/decorators/user.decorator';
 import { UserClaims } from 'src/auth/dto/user-claims.dto';
+import { Ticket } from 'src/ticket/entity/ticket.entity';
 
 @ApiTags('Аккаунт пользователя')
 @Controller('account')
@@ -25,7 +26,7 @@ export class AccountController {
 
   @Get('tickets')
   @ApiOperation({ summary: 'Получение списка счетов пользователя' })
-  @ApiResponse({ status: 200 })
+  @ApiResponse({ status: 200, type: [Ticket] })
   @RequiredAuth('EMPLOYEE')
   async tickets(@User('id') userId: string) {
     this.logger.verbose('getting tickets', { userId });
