@@ -15,7 +15,7 @@ import { UploadResponseDto } from './dto/upload.dto';
 import { UserReciept } from './dto/reciept.dto';
 
 @ApiTags('Чеки')
-@Controller('tickets')
+@Controller('reciepts')
 export class RecieptController {
   constructor(private readonly service: RecieptService) {}
 
