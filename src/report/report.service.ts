@@ -5,8 +5,6 @@ import Pagination from 'src/shared/pagination';
 import { ReportFilters } from './entities/report.entity';
 import { readToExcel, streamFromUrl } from 'src/utils/excel';
 import { MinioService } from 'src/minio/minio.service';
-import { NotFoundError } from 'rxjs';
-import { Ticket } from '@prisma/client';
 
 @Injectable()
 export class ReportService {
@@ -15,7 +13,7 @@ export class ReportService {
     private readonly minio: MinioService,
   ) {}
 
-  async upload(ticketId: string, file: Express.Multer.File) {
+  async upload(ticketId: string, file: Express.Multer.File, userId: string) {
     return this.prisma.$transaction(async (tx) => {
       try {
         const ticket = await tx.ticket.findFirstOrThrow({
@@ -34,6 +32,7 @@ export class ReportService {
         data: {
           id: uuidv7(),
           fileName,
+          addedBy: { connect: { id: userId } },
         },
       });
 

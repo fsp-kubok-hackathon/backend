@@ -1,10 +1,11 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { MinioService } from 'src/minio/minio.service';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { UserReciept } from 'src/reciept/dto/reciept.dto';
 import Pagination from 'src/shared/pagination';
 import { uuidv7 } from 'uuidv7';
+import { Ticket } from './entity/ticket.entity';
 
 @Injectable()
 export class TicketService {
@@ -43,6 +44,40 @@ export class TicketService {
     );
 
     return items;
+  }
+
+  async findById(ticketId: string): Promise<Ticket> {
+    return this.prisma.$transaction(async (tx) => {
+      try {
+        const ticket = await tx.ticket.findFirstOrThrow({
+          where: { id: ticketId },
+          include: {
+            report: {
+              include: {
+                addedBy: true,
+              },
+            },
+          },
+        });
+
+        return {
+          id: ticket.id,
+          createdAt: ticket.createdAt,
+          updatedAt: ticket.updatedAt,
+          endDate: ticket.endDate,
+          startDate: ticket.startDate,
+          status: ticket.status,
+          userId: ticket.userId,
+          report: ticket.report
+            ? {
+                ...ticket.report,
+              }
+            : undefined,
+        };
+      } catch (e) {
+        throw new NotFoundException('Тикет не найден' + e);
+      }
+    });
   }
 
   async upload(

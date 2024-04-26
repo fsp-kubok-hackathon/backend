@@ -22,6 +22,7 @@ import { CreateTicketDto } from './dto/create-ticket.dto';
 import { UserReciept } from 'src/reciept/dto/reciept.dto';
 import { RecieptService } from 'src/reciept/reciept.service';
 import { Ticket } from './entity/ticket.entity';
+import { Role } from '@prisma/client';
 import { stat } from 'fs';
 import { TicketStatus } from '@prisma/client';
 import { ListFilter } from 'src/decorators/listFilter.decorator';
@@ -71,5 +72,18 @@ export class TicketController {
   @ApiResponse({ status: 200, type: [UserReciept] })
   async getReciepts(@Param('id') ticketId: string): Promise<UserReciept[]> {
     return await this.service.findAllRecieptsById(ticketId);
+  }
+
+  @Get('/:id')
+  @ApiOperation({ summary: 'Получение тикета по id' })
+  @RequiredAuth()
+  @ApiResponse({ status: 200, type: Ticket })
+  async getTicketById(@Param('id') ticketId: string, @User() user: UserClaims) {
+    const ticket = await this.service.findById(ticketId);
+    if (user.role === Role.EMPLOYEE && ticket.userId !== user.id) {
+      throw new Error('Forbidden');
+    }
+
+    return ticket;
   }
 }

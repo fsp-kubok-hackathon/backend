@@ -25,7 +25,8 @@ model User {
 
   createdAt DateTime  @default(now()) @map("created_at")
   updatedAt DateTime? @map("updated_at")
-  Ticket    Reciept[]
+  reciepts  Reciept[]
+  reports   Report[]
 
   @@map("users")
 }
@@ -34,6 +35,9 @@ model Report {
   id        String  @id
   fileName  String  @map("file_name")
   validated Boolean @default(false)
+
+  addedBy   User   @relation(fields: [addedById], references: [id])
+  addedById String @map("added_by_id")
 
   createdAt   DateTime     @default(now()) @map("created_at")
   updatedAt   DateTime?    @map("updated_at")

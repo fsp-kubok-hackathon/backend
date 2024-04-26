@@ -11,14 +11,11 @@ export class Report {
   @ApiProperty()
   id: string;
 
-  @ApiProperty({ description: 'Статус выписки' })
-  status: ReportStatus;
-
   @ApiProperty({ description: 'Описание' })
-  url: string;
+  fileName: string;
 
   @ApiProperty({ description: 'Пользователь создавший выписку' })
-  user: User;
+  addedBy: User;
 
   @ApiProperty({ description: 'Дата создания' })
   createdAt: Date;
@@ -28,5 +25,5 @@ export class Report {
 }
 
 export class ReportFilters extends PartialType(
-  OmitType(Report, ['id', 'user']),
+  OmitType(Report, ['id', 'addedBy']),
 ) {}
