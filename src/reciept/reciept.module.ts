@@ -1,13 +1,13 @@
 import { Module } from '@nestjs/common';
-import { TicketService } from './ticket.service';
+import { RecieptService } from './reciept.service';
 import { PrismaModule } from 'src/prisma/prisma.module';
 import { MinioModule } from 'src/minio/minio.module';
 import { JwtModule } from '@nestjs/jwt';
-import { TicketController } from './ticket.controller';
+import { RecieptController } from './reciept.controller';
 
 @Module({
-  controllers: [TicketController],
-  providers: [TicketService],
+  controllers: [RecieptController],
+  providers: [RecieptService],
   imports: [PrismaModule, MinioModule, JwtModule],
 })
-export class TicketModule {}
+export class RecieptModule {}

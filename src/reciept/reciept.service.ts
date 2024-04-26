@@ -1,29 +1,28 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { Decimal } from '@prisma/client/runtime/library';
 import { MinioService } from 'src/minio/minio.service';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { UserTicket } from './dto/ticket.dto';
+import { UserReciept } from './dto/reciept.dto';
 
 @Injectable()
-export class TicketService {
-  private readonly logger = new Logger('TicketService');
+export class RecieptService {
+  private readonly logger = new Logger('recieptService');
 
   constructor(
     private readonly prisma: PrismaService,
     private readonly minio: MinioService,
   ) {}
 
-  async getByUser(userId: string): Promise<UserTicket[]> {
-    const tickets = await this.prisma.ticket.findMany({
+  async getByUser(userId: string): Promise<UserReciept[]> {
+    const reciepts = await this.prisma.reciept.findMany({
       where: {
         userId: userId,
       },
     });
 
-    const items: UserTicket[] = await Promise.all(
-      tickets.map(async (t) => {
+    const items: UserReciept[] = await Promise.all(
+      reciepts.map(async (t) => {
         const imageLink = await this.minio.getFileUrl(t.imageName);
-        const item: UserTicket = {
+        const item: UserReciept = {
           amount: String(t.amount),
           fn: String(t.fn),
           fp: String(t.fp),
@@ -53,7 +52,7 @@ export class TicketService {
     let created = 0;
 
     try {
-      const tickets = await this.prisma.ticket.createMany({
+      const reciepts = await this.prisma.reciept.createMany({
         skipDuplicates: true,
         data: fileNames.map((f) => ({
           userId: userId,
@@ -65,10 +64,10 @@ export class TicketService {
           purpose: 'Покупка в MOLOKO',
         })),
       });
-      this.logger.verbose('tickets created', tickets);
-      created = tickets.count;
+      this.logger.verbose('reciepts created', reciepts);
+      created = reciepts.count;
     } catch (e) {
-      this.logger.error('ticket craete error', e);
+      this.logger.error('reciept craete error', e);
     }
 
     return created;
