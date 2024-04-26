@@ -38,38 +38,39 @@ export class RecieptService {
 
     return items;
   }
-  async upload(
-    userId: string,
-    files: Array<Express.Multer.File>,
-  ): Promise<number> {
-    const fileNames = await Promise.all(
-      files.map(async (f) => {
-        const { fileName } = await this.minio.upload(f);
-        return fileName;
-      }),
-    );
+  // async upload(
+  //   userId: string,
+  //   files: Array<Express.Multer.File>,
+  // ): Promise<number> {
+  //   const fileNames = await Promise.all(
+  //     files.map(async (f) => {
+  //       const { fileName } = await this.minio.upload(f);
+  //       return fileName;
+  //     }),
+  //   );
 
-    let created = 0;
+  //   let created = 0;
 
-    try {
-      const reciepts = await this.prisma.reciept.createMany({
-        skipDuplicates: true,
-        data: fileNames.map((f) => ({
-          userId: userId,
-          fn: 1242142154219742,
-          fp: 4194194721741294,
-          amount: 1337,
-          imageName: f,
-          paidAt: new Date(),
-          purpose: 'Покупка в MOLOKO',
-        })),
-      });
-      this.logger.verbose('reciepts created', reciepts);
-      created = reciepts.count;
-    } catch (e) {
-      this.logger.error('reciept craete error', e);
-    }
-
-    return created;
-  }
+  //   try {
+  //     const reciepts = await this.prisma.reciept.createMany({
+  //       skipDuplicates: true,
+  //       data: fileNames.map((f) => ({
+  //         id:
+  //         userId: userId,
+  //         fn: 1242142154219742,
+  //         fp: 4194194721741294,
+  //         amount: 1337,
+  //         imageName: f,
+  //         paidAt: new Date(),
+  //         purpose: 'Покупка в MOLOKO',
+  //       })),
+  //     });
+  //     this.logger.verbose('reciepts created', reciepts);
+  //     created = reciepts.count;
+  //   } catch (e) {
+  //     this.logger.error('reciept craete error', e);
+  //   }
+  //
+  //   return created;
+  // }
 }

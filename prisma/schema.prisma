@@ -31,6 +31,7 @@ model User {
 }
 
 model Reciept {
+  id        String   @id
   userId    String   @map("user_id")
   imageName String   @map("image_name")
   fn        BigInt
@@ -42,8 +43,31 @@ model Reciept {
   createdAt DateTime  @default(now()) @map("created_at")
   updatedAt DateTime? @map("updated_at")
 
-  user User @relation(fields: [userId], references: [id])
+  user          User            @relation(fields: [userId], references: [id])
+  TicketReciept TicketReciept[]
 
-  @@id([userId, imageName])
   @@map("reciepts")
+}
+
+model Ticket {
+  id            String          @id
+  userId        String          @map("user_id")
+  startDate     DateTime        @map("start_date")
+  endDate       DateTime        @map("end_date")
+  createdAt     DateTime        @default(now()) @map("created_at")
+  updatedAt     DateTime?       @map("updated_at")
+  TicketReciept TicketReciept[]
+
+  @@map("tickets")
+}
+
+model TicketReciept {
+  ticketId  String @map("ticket_id")
+  recieptId String @map("reciept_id")
+
+  ticket  Ticket  @relation(fields: [ticketId], references: [id])
+  reciept Reciept @relation(fields: [recieptId], references: [id])
+
+  @@id([ticketId, recieptId])
+  @@map("ticket_reciepts")
 }
