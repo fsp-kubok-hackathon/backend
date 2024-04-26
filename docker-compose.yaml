@@ -5,7 +5,7 @@ services:
     build:
       context: .
     env_file:
-      - production.env
+      - .env
     ports:
       - 4200:${APP_PORT}
     volumes:
