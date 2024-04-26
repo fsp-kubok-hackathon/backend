@@ -22,4 +22,14 @@ export class AccountController {
     const user = await this.service.profile(id);
     return user;
   }
+
+  @Get('tickets')
+  @ApiOperation({ summary: 'Получение списка счетов пользователя' })
+  @ApiResponse({ status: 200 })
+  @RequiredAuth('EMPLOYEE')
+  async tickets(@User('id') userId: string) {
+    this.logger.verbose('getting tickets', { userId });
+    const tickets = await this.service.tickets(userId);
+    return tickets;
+  }
 }
