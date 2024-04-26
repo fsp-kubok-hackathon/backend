@@ -30,6 +30,47 @@ model User {
   @@map("users")
 }
 
+model Report {
+  id        String  @id
+  url       String
+  validated Boolean @default(false)
+
+  createdAt   DateTime     @default(now()) @map("created_at")
+  updatedAt   DateTime?    @map("updated_at")
+  reportItems ReportItem[]
+
+  @@map("reports")
+}
+
+model ReportItem {
+  id Int @id @default(autoincrement())
+
+  accountNumber       String   @map("account_number")
+  txId                String   @unique @map("tx_id")
+  operationType       String   @map("operation_type")
+  category            String
+  status              String
+  authDate            DateTime @map("auth_date")
+  txDate              DateTime @map("tx_date")
+  currency            Int
+  sum                 Decimal
+  counterparty        String
+  counterpartyINN     String   @map("counterparty_inn")
+  counterpartyKPP     String   @map("counterparty_kpp")
+  counterpartyAccount String   @map("counterparty_account")
+  counterpartyBik     String   @map("counterparty_bik")
+  corrAccount         String   @map("corr_account")
+  purpose             String
+  cardNo              String   @map("card_no")
+  MCC                 String   @map("mcc")
+  country             String
+  city                String
+
+  report   Report @relation(fields: [reportId], references: [id])
+  reportId String
+
+  @@map("report_items")
+  }
 model Reciept {
   id        String   @id
   userId    String   @map("user_id")
