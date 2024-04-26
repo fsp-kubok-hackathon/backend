@@ -10,4 +10,4 @@ import { MinioModule } from 'src/minio/minio.module';
   controllers: [ReportController],
   providers: [ReportService],
 })
-export class ReportModule { }
+export class ReportModule {}
