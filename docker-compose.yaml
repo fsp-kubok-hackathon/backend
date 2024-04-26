@@ -10,6 +10,7 @@ services:
       - 4200:${APP_PORT}
     volumes:
       - modules:/app
+      - ./prisma:/app/prisma
     depends_on:
       - postgres
       - redis
