@@ -38,6 +38,7 @@ model Report {
   createdAt   DateTime     @default(now()) @map("created_at")
   updatedAt   DateTime?    @map("updated_at")
   reportItems ReportItem[]
+  ticket      Ticket?
 
   @@map("reports")
 }
@@ -46,7 +47,7 @@ model ReportItem {
   id Int @id @default(autoincrement())
 
   accountNumber       String   @map("account_number")
-  txId                String   @unique @map("tx_id")
+  txId                String   @map("tx_id")
   operationType       String   @map("operation_type")
   category            String
   status              String
@@ -70,7 +71,8 @@ model ReportItem {
   reportId String
 
   @@map("report_items")
-  }
+}
+
 model Reciept {
   id        String   @id
   userId    String   @map("user_id")
@@ -91,12 +93,15 @@ model Reciept {
 }
 
 model Ticket {
-  id            String          @id
-  userId        String          @map("user_id")
-  startDate     DateTime        @map("start_date")
-  endDate       DateTime        @map("end_date")
-  createdAt     DateTime        @default(now()) @map("created_at")
-  updatedAt     DateTime?       @map("updated_at")
+  id        String    @id
+  userId    String    @map("user_id")
+  startDate DateTime  @map("start_date")
+  endDate   DateTime  @map("end_date")
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime? @map("updated_at")
+
+  report        Report?         @relation(fields: [reportId], references: [id])
+  reportId      String          @unique
   TicketReciept TicketReciept[]
 
   @@map("tickets")

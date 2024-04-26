@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { MinioService } from 'src/minio/minio.service';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { ReportService } from 'src/report/report.service';
 import { uuidv7 } from 'uuidv7';
 
 @Injectable()
@@ -8,7 +9,7 @@ export class TicketService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly minio: MinioService,
-  ) {}
+  ) { }
 
   async upload(
     userId: string,
