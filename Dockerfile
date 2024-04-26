@@ -9,7 +9,6 @@ RUN npm ci
 COPY --chown=node:node . .
 
 RUN npm run prisma:generate
-RUN npm run prisma:push
 
 USER node
 
@@ -39,4 +38,9 @@ COPY --chown=node:node package*.json ./
 COPY --chown=node:node --from=build /app/node_modules ./node_modules
 COPY --chown=node:node --from=build /app/dist ./dist
 
-CMD ["node", "dist/main.js"]
+ADD https://github.com/ufoscout/docker-compose-wait/releases/download/2.12.1/wait /app/wait
+RUN chmod +x /app/wait
+
+CMD ./wait \
+  && ["npm", "run", "prisma:push"] \
+  && ["node", "dist/main.js"] 
