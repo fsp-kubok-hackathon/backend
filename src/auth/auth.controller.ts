@@ -84,7 +84,7 @@ export class AuthController {
     this.logger.verbose('clearing cookie');
   }
 
-  @Get('refresh')
+  @Post('refresh')
   async refresh(@Body() dto: { refreshToken: string }) {
     const token = dto.refreshToken;
     this.logger.verbose('refreshing token', dto);
