@@ -1,0 +1,39 @@
+version: '4.5'
+
+services:
+  postgres:
+    image: postgres:16.2-alpine3.19
+    restart: always
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    env_file:
+      - .env
+    ports:
+      - '${POSTGRES_PORT}:5432'
+
+  redis:
+    image: redis:7.2.4-alpine
+    restart: always
+    ports:
+      - '${REDIS_PORT}:6379'
+    env_file:
+      - .env
+    volumes:
+      - redisdata:/data
+
+  minio:
+    image: minio/minio:RELEASE.2024-03-30T09-41-56Z.fips
+    container_name: minio
+    volumes:
+      - miniodata:/data
+    ports:
+      - '9000:9000'
+      - '9001:9001'
+    env_file:
+      - .env
+    command: server /data --console-address ":9001"
+
+volumes:
+  pgdata:
+  redisdata:
+  miniodata:
