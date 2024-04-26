@@ -10,7 +10,7 @@ services:
       - 4200:${APP_PORT}
     volumes:
       - modules:/app
-      - ./prisma:/app/prism
+      - ./prisma:/app/prisma
       - ./wait:/app/wait
     depends_on:
       - postgres

@@ -37,10 +37,8 @@ COPY --chown=node:node package*.json ./
 
 COPY --chown=node:node --from=build /app/node_modules ./node_modules
 COPY --chown=node:node --from=build /app/dist ./dist
-COPY --chown=node:node ./prisma ./prisma
 
-RUN chmod +x /app/wait
-
-CMD /app/wait \
+CMD chmod +x ./wait \
+  && ./wait \
   && npx prisma db push --schema ./prisma/schema.prisma \
-  && node dist/main.js  
+  && node dist/main.js 
