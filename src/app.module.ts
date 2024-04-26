@@ -8,6 +8,7 @@ import { AccountModule } from './account/account.module';
 import { MinioModule } from './minio/minio.module';
 import { ConfigModule } from '@nestjs/config';
 import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
+import { ReportModule } from './report/report.module';
 
 @Module({
   imports: [
@@ -19,6 +20,7 @@ import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
     LoggerModule,
     AccountModule,
     MinioModule,
+    ReportModule,
   ],
   controllers: [],
   providers: [],
