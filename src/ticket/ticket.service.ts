@@ -3,6 +3,7 @@ import { Prisma } from '@prisma/client';
 import { MinioService } from 'src/minio/minio.service';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { UserReciept } from 'src/reciept/dto/reciept.dto';
+import { ReportService } from 'src/report/report.service';
 import { uuidv7 } from 'uuidv7';
 
 @Injectable()
@@ -10,7 +11,7 @@ export class TicketService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly minio: MinioService,
-  ) {}
+  ) { }
 
   async findAll(filter?: Prisma.TicketWhereInput) {
     return this.prisma.ticket.findMany({ where: filter });
