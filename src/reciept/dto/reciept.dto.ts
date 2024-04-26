@@ -1,4 +1,4 @@
-export class UserTicket {
+export class UserReciept {
   imageLink: string;
   fn: string;
   fp: string;

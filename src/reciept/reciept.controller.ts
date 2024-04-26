@@ -5,25 +5,25 @@ import {
   UseInterceptors,
   UploadedFiles,
 } from '@nestjs/common';
-import { TicketService } from './ticket.service';
+import { RecieptService } from './reciept.service';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { RequiredAuth } from 'src/auth/decorators/auth.decorator';
 import { UserClaims } from 'src/auth/dto/user-claims.dto';
 import { User } from 'src/auth/decorators/user.decorator';
 import { AnyFilesInterceptor } from '@nestjs/platform-express';
 import { UploadResponseDto } from './dto/upload.dto';
-import { UserTicket } from './dto/ticket.dto';
+import { UserReciept } from './dto/reciept.dto';
 
 @ApiTags('Чеки')
-@Controller('tickets')
-export class TicketController {
-  constructor(private readonly service: TicketService) {}
+@Controller('reciepts')
+export class RecieptController {
+  constructor(private readonly service: RecieptService) {}
 
   @Get('/')
   @ApiOperation({ summary: 'Получение чеков пользователя' })
   @RequiredAuth()
-  @ApiResponse({ status: 200, type: [UserTicket] })
-  async get(@User('id') userId: string): Promise<UserTicket[]> {
+  @ApiResponse({ status: 200, type: [UserReciept] })
+  async get(@User('id') userId: string): Promise<UserReciept[]> {
     return await this.service.getByUser(userId);
   }
 

@@ -8,7 +8,7 @@ import { AccountModule } from './account/account.module';
 import { MinioModule } from './minio/minio.module';
 import { ConfigModule } from '@nestjs/config';
 import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
-import { TicketModule } from './ticket/ticket.module';
+import { RecieptModule } from './reciept/reciept.module';
 
 @Module({
   imports: [
@@ -20,7 +20,7 @@ import { TicketModule } from './ticket/ticket.module';
     LoggerModule,
     AccountModule,
     MinioModule,
-    TicketModule,
+    RecieptModule,
   ],
   controllers: [],
   providers: [],
