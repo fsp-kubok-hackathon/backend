@@ -3,6 +3,7 @@ import { Prisma } from '@prisma/client';
 import { MinioService } from 'src/minio/minio.service';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { UserReciept } from 'src/reciept/dto/reciept.dto';
+import Pagination from 'src/shared/pagination';
 import { uuidv7 } from 'uuidv7';
 import { Ticket } from './entity/ticket.entity';
 
@@ -13,8 +14,9 @@ export class TicketService {
     private readonly minio: MinioService,
   ) {}
 
-  async findAll(filter?: Prisma.TicketWhereInput) {
-    return this.prisma.ticket.findMany({ where: filter });
+  async findAll(filter?: Prisma.TicketWhereInput, pagination?: Pagination) {
+    // const { limit: skip, offset: take } = pagination;
+    return await this.prisma.ticket.findMany({ where: filter });
   }
 
   async findAllRecieptsById(ticketId: string) {
