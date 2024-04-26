@@ -4,7 +4,6 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import { isUUID } from 'class-validator';
 import { uuidv7 } from 'uuidv7';
 import { MinioService } from 'src/minio/minio.service';
-import { Bucket } from 'src/minio/minio.consts';
 import { Prisma } from '@prisma/client';
 
 @Injectable()
@@ -66,11 +65,5 @@ export class UsersService {
     return await this.prisma.user.findUnique({
       where: { handle },
     });
-  }
-
-  async getAvatarLink(fileName: string): Promise<string> {
-    this.logger.verbose('getting avatar link', { fileName });
-    const link = await this.minio.getFileUrl(fileName, Bucket.USER);
-    return link;
   }
 }
