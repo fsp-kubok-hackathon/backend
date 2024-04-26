@@ -39,9 +39,7 @@ COPY --chown=node:node --from=build /app/node_modules ./node_modules
 COPY --chown=node:node --from=build /app/dist ./dist
 COPY --chown=node:node ./prisma ./prisma
 
-ADD https://github.com/ufoscout/docker-compose-wait/releases/download/2.12.1/wait ./wait
-RUN chmod +x ./wait
 
-CMD ./wait \
+CMD /app/wait \
   && npx prisma db push --schema ./prisma/schema.prisma \
   && node dist/main.js  
