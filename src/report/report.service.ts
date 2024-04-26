@@ -6,6 +6,7 @@ import { ReportFilters } from './entities/report.entity';
 import { readToExcel, streamFromUrl } from 'src/utils/excel';
 import { MinioService } from 'src/minio/minio.service';
 import { NotFoundError } from 'rxjs';
+import { Ticket } from '@prisma/client';
 
 
 @Injectable()
@@ -16,19 +17,27 @@ export class ReportService {
 
   async upload(ticketId: string, file: Express.Multer.File) {
     return this.prisma.$transaction(async (tx) => {
+      try {
+        const ticket = await tx.ticket.findFirstOrThrow({ where: { id: ticketId }, include: { report: true } })
+        if (ticket.report)
+          throw new Error('Тикет уже содержит выписку')
+      } catch (e) {
+        throw new NotFoundException(`Тикет не найден ${e}`)
+      }
+
+
       const { fileName } = await this.minio.upload(file);
-      const url = await this.minio.getFileUrl(fileName);
 
       // Создаем выписку
       const report = await tx.report.create({
         data: {
           id: uuidv7(),
-          url: url,
+          fileName,
         }
       })
 
       // Парсим выписку
-      const stream = await streamFromUrl(report.url)
+      const stream = await streamFromUrl(await this.minio.getFileUrl(report.fileName));
       const reportItems = (await readToExcel(stream)).map(item => {
         item.reportId = report.id;
         return item;
@@ -37,16 +46,12 @@ export class ReportService {
       // Сохраняем данные из выписки
       await tx.reportItem.createMany({ data: reportItems })
 
-      try {
-        // Привязываем выписку к тикету
-        await tx.ticket.update({
-          where: { id: ticketId }, data: {
-            report: { connect: { id: report.id } }
-          }
-        })
-      } catch (e) {
-        throw new NotFoundException("ticketId not found")
-      }
+      // Привязываем выписку к тикету
+      await tx.ticket.update({
+        where: { id: ticketId }, data: {
+          report: { connect: { id: report.id } }
+        }
+      })
     })
   }
 
