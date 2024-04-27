@@ -81,10 +81,13 @@ model ReportItem {
 }
 
 model RecieptCategory {
-  id   Int    @id
-  name String
+  id       Int     @id @default(autoincrement())
+  name     String
+  maxPrice Decimal @map("max_price")
 
   reciepts Reciept[]
+
+  @@map("reciept_categories")
 }
 
 model Reciept {
@@ -95,7 +98,7 @@ model Reciept {
   fp         BigInt
   amount     Decimal
   purpose    String
-  paidAt     DateTime         @map("paid_at")
+  paidAt     DateTime        @map("paid_at")
   category   RecieptCategory? @relation(fields: [categoryId], references: [id])
   categoryId Int?
 

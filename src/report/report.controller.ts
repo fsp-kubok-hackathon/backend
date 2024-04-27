@@ -16,7 +16,6 @@ import { RequiredAuth } from 'src/auth/decorators/auth.decorator';
 import { ReportFilters } from './entities/report.entity';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { User } from 'src/auth/decorators/user.decorator';
-import { Type } from 'class-transformer';
 
 @ApiTags('Выписки')
 @Controller('reports')
