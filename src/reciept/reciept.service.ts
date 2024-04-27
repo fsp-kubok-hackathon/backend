@@ -3,6 +3,7 @@ import { MinioService } from 'src/minio/minio.service';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { UserReciept } from './dto/reciept.dto';
 import { Prisma } from '@prisma/client';
+import { GigaService } from 'src/giga/giga/giga.service';
 
 @Injectable()
 export class RecieptService {
@@ -11,6 +12,7 @@ export class RecieptService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly minio: MinioService,
+    private readonly giga: GigaService,
   ) {}
 
   async findAllByTicketId(ticketId: string): Promise<UserReciept[]> {
@@ -63,5 +65,21 @@ export class RecieptService {
     );
 
     return items;
+  }
+
+  async getCategory(query: string): Promise<number> {
+    return await this.prisma.$transaction(async (tx) => {
+      const categories = await tx.recieptCategory.findMany();
+      const category = await this.giga.getCategory(
+        query,
+        categories.map((c) => c.name),
+      );
+
+      const foundCategory = categories.find(
+        (c) => c.name.trim() === category[0].trim(),
+      );
+
+      return foundCategory ? foundCategory.id : null;
+    });
   }
 }

@@ -11,6 +11,9 @@ import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { ReportModule } from './report/report.module';
 import { RecieptModule } from './reciept/reciept.module';
 import { TicketModule } from './ticket/ticket.module';
+import { GigaService } from './giga/giga/giga.service';
+import { GigaModule } from './giga/giga/giga.module';
+import { RecieptCheckerModule } from './reciept-checker/reciept-checker.module';
 
 @Module({
   imports: [
@@ -25,9 +28,11 @@ import { TicketModule } from './ticket/ticket.module';
     ReportModule,
     RecieptModule,
     TicketModule,
+    GigaModule,
+    RecieptCheckerModule,
   ],
   controllers: [],
-  providers: [],
+  providers: [GigaService],
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {

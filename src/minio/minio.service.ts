@@ -61,7 +61,10 @@ export class MinioService implements OnModuleInit {
   }
 
   async getFileUrl(fileName: string) {
-    return await this.client.presignedUrl('GET', this.bucket, fileName);
+    // const link = await this.client.presignedUrl('GET', this.bucket, fileName);
+    // return link.replace('http://minio:9000', 'https://s3.mzhn.fun');
+
+    return `https://s3.mzhn.fun/images/${fileName}`;
   }
 
   async deleteFile(fileName: string) {
