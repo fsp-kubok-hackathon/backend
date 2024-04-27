@@ -11,6 +11,7 @@ import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { ReportModule } from './report/report.module';
 import { RecieptModule } from './reciept/reciept.module';
 import { TicketModule } from './ticket/ticket.module';
+import { RecieptCheckerModule } from './reciept-checker/reciept-checker.module';
 
 @Module({
   imports: [
@@ -25,6 +26,7 @@ import { TicketModule } from './ticket/ticket.module';
     ReportModule,
     RecieptModule,
     TicketModule,
+    RecieptCheckerModule,
   ],
   controllers: [],
   providers: [],
