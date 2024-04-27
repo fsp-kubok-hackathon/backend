@@ -48,7 +48,12 @@ export class TicketController {
     @Body() { endDate, startDate }: CreateTicketDto,
     @User() user: UserClaims,
   ) {
-    return await this.service.upload(user.id, files, startDate, endDate);
+    return await this.service.upload({
+      userId: user.id,
+      files,
+      startDate,
+      endDate,
+    });
   }
 
   @Get()
@@ -86,5 +91,18 @@ export class TicketController {
     }
 
     return ticket;
+  }
+
+  @Post('/:id/reciepts')
+  @ApiOperation({ summary: 'Дозагрузка чеков в тикет' })
+  @RequiredAuth()
+  @ApiResponse({ status: 200, type: [UserReciept] })
+  @UseInterceptors(AnyFilesInterceptor())
+  async uploadReciept(
+    @Param('id') ticketId: string,
+    @UploadedFiles() files: Array<Express.Multer.File>,
+    @User('id') userId: string,
+  ) {
+    return await this.service.upload({ files, ticketId, userId });
   }
 }

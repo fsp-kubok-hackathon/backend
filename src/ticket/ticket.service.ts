@@ -115,13 +115,16 @@ export class TicketService {
     });
   }
 
-  async upload(
-    userId: string,
-    files: Express.Multer.File[],
-    startDate: Date,
-    endDate: Date,
-  ) {
+  async upload(data: {
+    userId: string;
+    files: Express.Multer.File[];
+    startDate?: Date;
+    endDate?: Date;
+    ticketId?: string;
+  }) {
     const id = uuidv7();
+
+    const { endDate, files, startDate, userId, ticketId } = data;
 
     const reciepts = await Promise.all(
       files.map(async (f) => {
@@ -171,19 +174,21 @@ export class TicketService {
         ),
       });
 
-      const t = await tx.ticket.create({
-        data: {
-          id,
-          startDate,
-          endDate,
-          userId,
-        },
-      });
+      if (!ticketId) {
+        await tx.ticket.create({
+          data: {
+            id,
+            startDate,
+            endDate,
+            userId,
+          },
+        });
+      }
 
       await tx.ticketReciept.createMany({
         data: rr.map((r) => {
           return {
-            ticketId: t.id,
+            ticketId: ticketId ?? id,
             recieptId: r.id,
           };
         }),
