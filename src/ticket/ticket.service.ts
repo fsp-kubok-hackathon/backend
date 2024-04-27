@@ -136,7 +136,7 @@ export class TicketService {
             fp: 123456789,
             amount: 1337,
             userId: userId,
-            paidAt: new Date(),
+            paidAt: new Date('2024-04-26T22:02:23'),
             purpose: 'Покупка в MOLOKO',
             imageName: r.fileName,
           };
