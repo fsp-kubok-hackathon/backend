@@ -81,23 +81,23 @@ model ReportItem {
 }
 
 model RecieptCategory {
-  id Int @id
+  id   Int    @id
   name String
 
   reciepts Reciept[]
 }
 
 model Reciept {
-  id         String          @id
-  userId     String          @map("user_id")
-  imageName  String          @map("image_name")
+  id         String           @id
+  userId     String           @map("user_id")
+  imageName  String           @map("image_name")
   fn         BigInt
   fp         BigInt
   amount     Decimal
   purpose    String
-  paidAt     DateTime        @map("paid_at")
-  category   RecieptCategory @relation(fields: [categoryId], references: [id])
-  categoryId Int
+  paidAt     DateTime         @map("paid_at")
+  category   RecieptCategory? @relation(fields: [categoryId], references: [id])
+  categoryId Int?
 
   createdAt DateTime  @default(now()) @map("created_at")
   updatedAt DateTime? @map("updated_at")
