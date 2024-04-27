@@ -95,7 +95,7 @@ export class TicketController {
 
   @Post('/:id/reciepts')
   @ApiOperation({ summary: 'Дозагрузка чеков в тикет' })
-  @RequiredAuth()
+  @RequiredAuth('EMPLOYEE')
   @ApiResponse({ status: 200, type: [UserReciept] })
   @UseInterceptors(AnyFilesInterceptor())
   async uploadReciept(

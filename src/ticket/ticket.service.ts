@@ -125,7 +125,7 @@ export class TicketService {
     const id = uuidv7();
 
     const { endDate, files, startDate, userId, ticketId } = data;
-
+    const errors = [];
     const reciepts = await Promise.all(
       files.map(async (f) => {
         const { fileName } = await this.minio.upload(f);
@@ -134,7 +134,7 @@ export class TicketService {
       }),
     );
 
-    this.prisma.$transaction(async (tx) => {
+    await this.prisma.$transaction(async (tx) => {
       const rr = (
         await Promise.all(
           reciepts.map(async (r) => {
@@ -144,7 +144,7 @@ export class TicketService {
 
             if (!ok) {
               this.logger.warn('reciept checker error', { imageUrl, info });
-              this.minio.deleteFile(r.fileName);
+              errors.push({ imageUrl });
               return null;
             }
 
@@ -195,6 +195,7 @@ export class TicketService {
       });
     });
 
-    return { id };
+    this.logger.verbose('errors', errors);
+    return { id, errors };
   }
 }
