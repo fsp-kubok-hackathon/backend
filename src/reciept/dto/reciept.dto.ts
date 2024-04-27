@@ -11,7 +11,7 @@ export class UserReciept {
   fp: string;
 
   @ApiProperty()
-  amount: string;
+  totalAmount: number;
 
   @ApiProperty()
   purpose: string;

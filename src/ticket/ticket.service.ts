@@ -55,7 +55,7 @@ export class TicketService {
         const r = t.reciept;
         const imageLink = await this.minio.getFileUrl(r.imageName);
         const item: UserReciept = {
-          amount: String(r.amount),
+          totalAmount: r.totalAmount.toNumber(),
           fn: String(r.fn),
           fp: String(r.fp),
           paidAt: r.paidAt,
@@ -149,12 +149,20 @@ export class TicketService {
               id: r.id,
               fn: BigInt(info.data.json.fiscalDriveNumber),
               fp: info.data.json.fiscalSign,
-              amount: info.data.json.totalSum,
+              totalAmount: info.data.json.totalSum,
               userId: userId,
               paidAt: new Date(info.data.json.dateTime),
               purpose: info.data.json.user ?? 'Неизвестно',
               imageName: r.fileName,
-              items: info.data.json.items.map((i) => i.name).join('\n'),
+              items: await Promise.all(
+                info.data.json.items.map(async (i) => ({
+                  recieptId: r.id,
+                  name: i.name,
+                  amount: i.price,
+                  quantity: i.quantity,
+                  categoryId: await this.recieptService.getCategory(i.name),
+                })),
+              ),
               // purpose: info.data.json.items.map(i => i.name).join(', '),
             };
           }),
@@ -162,13 +170,10 @@ export class TicketService {
       ).filter((r) => r !== null);
 
       await tx.reciept.createMany({
-        data: await Promise.all(
-          rr.map(async (r) => ({
-            ...r,
-            items: r.items,
-            categoryId: await this.recieptService.getCategory(r.items),
-          })),
-        ),
+        data: rr.map((r) => ({ ...r, items: undefined })),
+      });
+      rr.forEach(async (r) => {
+        if (r.items) await tx.recieptItem.createMany({ data: r.items });
       });
 
       const t = await tx.ticket.create({
