@@ -13,6 +13,7 @@ import { RecieptModule } from './reciept/reciept.module';
 import { TicketModule } from './ticket/ticket.module';
 import { GigaService } from './giga/giga/giga.service';
 import { GigaModule } from './giga/giga/giga.module';
+import { RecieptCheckerModule } from './reciept-checker/reciept-checker.module';
 
 @Module({
   imports: [
@@ -28,6 +29,7 @@ import { GigaModule } from './giga/giga/giga.module';
     RecieptModule,
     TicketModule,
     GigaModule,
+    RecieptCheckerModule,
   ],
   controllers: [],
   providers: [GigaService],
