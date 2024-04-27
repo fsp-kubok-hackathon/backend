@@ -100,6 +100,8 @@ model RecieptItem {
 
   reciept   Reciept @relation(fields: [recieptId], references: [id])
   recieptId String
+
+  @@map("reciept_items")
 }
 
 model Reciept {
@@ -151,8 +153,8 @@ model TicketReciept {
   recieptId String  @map("reciept_id")
   reason    String?
 
-  ticket  Ticket  @relation(fields: [ticketId], references: [id])
-  reciept Reciept @relation(fields: [recieptId], references: [id])
+  ticket  Ticket  @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+  reciept Reciept @relation(fields: [recieptId], references: [id], onDelete: Cascade)
 
   @@id([ticketId, recieptId])
   @@map("ticket_reciepts")

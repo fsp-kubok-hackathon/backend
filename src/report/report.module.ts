@@ -9,5 +9,6 @@ import { MinioModule } from 'src/minio/minio.module';
   imports: [PrismaModule, JwtModule, MinioModule],
   controllers: [ReportController],
   providers: [ReportService],
+  exports: [ReportService],
 })
 export class ReportModule {}
