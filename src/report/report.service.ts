@@ -5,6 +5,7 @@ import Pagination from 'src/shared/pagination';
 import { ReportFilters } from './entities/report.entity';
 import { readToExcel, streamFromUrl } from 'src/utils/excel';
 import { MinioService } from 'src/minio/minio.service';
+import { isEqual } from 'date-fns';
 
 @Injectable()
 export class ReportService {
@@ -14,7 +15,7 @@ export class ReportService {
   ) {}
 
   async upload(ticketId: string, file: Express.Multer.File, userId: string) {
-    return this.prisma.$transaction(async (tx) => {
+    await this.prisma.$transaction(async (tx) => {
       try {
         const ticket = await tx.ticket.findFirstOrThrow({
           where: { id: ticketId },
@@ -55,6 +56,56 @@ export class ReportService {
           report: { connect: { id: report.id } },
         },
       });
+    });
+
+    return this.validate(ticketId);
+  }
+
+  async validate(ticketId: string) {
+    return this.prisma.$transaction(async (tx) => {
+      const ticket = await tx.ticket.findFirstOrThrow({
+        where: { id: ticketId },
+        include: { report: true, TicketReciept: true },
+      });
+
+      const reportItems = await tx.reportItem.findMany({
+        where: { reportId: ticket.report.id },
+      });
+
+      const reciepts = await Promise.all(
+        ticket.TicketReciept.map(
+          async (ticket) =>
+            await tx.reciept.findFirst({ where: { id: ticket.recieptId } }),
+        ),
+      );
+      let allIsOk = true;
+      for (const item of reportItems) {
+        const receipt = reciepts.find((receipt) => {
+          console.log(
+            receipt.paidAt.setMilliseconds(0) ==
+              item.authDate.setMilliseconds(0),
+            receipt.amount.equals(item.sum),
+          );
+          return (
+            receipt.paidAt.setMilliseconds(0) ===
+              item.authDate.setMilliseconds(0) &&
+            item.sum.equals(receipt.amount)
+          );
+        });
+        console.log(receipt);
+        if (receipt)
+          await tx.reportItem.update({
+            where: { id: item.id },
+            data: { approved: true },
+          });
+        else allIsOk = false;
+      }
+
+      if (!allIsOk)
+        tx.ticket.update({
+          where: { id: ticketId },
+          data: { status: 'FAILED' },
+        });
     });
   }
 
