@@ -5,7 +5,7 @@ import Pagination from 'src/shared/pagination';
 import { ReportFilters } from './entities/report.entity';
 import { readToExcel, streamFromUrl } from 'src/utils/excel';
 import { MinioService } from 'src/minio/minio.service';
-import { isEqual } from 'date-fns';
+import { ReportItem } from '@prisma/client';
 
 @Injectable()
 export class ReportService {
@@ -59,6 +59,27 @@ export class ReportService {
     });
 
     return this.validate(ticketId);
+  }
+
+  async getReportItems(
+    ticketId: string,
+    approved: boolean,
+  ): Promise<ReportItem[]> {
+    return this.prisma.$transaction(async (tx) => {
+      const ticket = await tx.ticket.findFirstOrThrow({
+        where: { id: ticketId },
+        include: { report: true },
+      });
+
+      if (!ticket || !ticket.report)
+        throw new NotFoundException('Тикет не найден');
+
+      const items = await tx.reportItem.findMany({
+        where: { AND: [{ reportId: ticket.report.id }, { approved }] },
+      });
+
+      return items;
+    });
   }
 
   async validate(ticketId: string) {
