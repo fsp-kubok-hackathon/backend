@@ -26,7 +26,7 @@ export const readToExcel = async (
   const _ = await workbook.xlsx.read(stream);
   if (workbook.worksheets.length != 1) throw new Error('Invalid excel file');
   const reports: Omit<ReportItem, 'id'>[] = [];
-  for (let i = 3; i <= workbook.worksheets[0].rowCount; i++) {
+  for (let i = 3; i <= workbook.worksheets[0].actualRowCount; i++) {
     const row = workbook.worksheets[0].getRow(i);
     reports.push({
       reportId: '',
@@ -48,8 +48,8 @@ export const readToExcel = async (
       purpose: row.getCell(20).text,
       cardNo: row.getCell(24).text,
       MCC: row.getCell(25).text,
-      country: row.getCell(26).text,
-      city: row.getCell(27).text,
+      country: row.getCell(27).text,
+      city: row.getCell(26).text,
     });
   }
   stream.destroy();
