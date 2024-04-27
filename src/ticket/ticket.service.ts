@@ -143,6 +143,8 @@ export class TicketService {
               return null;
             }
 
+            // TODO передать items
+
             return {
               id: r.id,
               fn: BigInt(info.data.json.fiscalDriveNumber),
@@ -158,8 +160,18 @@ export class TicketService {
         )
       ).filter((r) => r !== null);
 
+      let category = await tx.recieptCategory.findFirst({
+        where: { name: 'Прочее' },
+      });
+
+      if (!category) {
+        category = await tx.recieptCategory.create({
+          data: { id: 1, name: 'Прочее' },
+        });
+      }
+
       await tx.reciept.createMany({
-        data: rr,
+        data: rr.map((r) => ({ ...r, categoryId: category.id })),
       });
 
       const t = await tx.ticket.create({
