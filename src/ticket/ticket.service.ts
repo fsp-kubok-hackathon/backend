@@ -5,6 +5,7 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import { UserReciept } from 'src/reciept/dto/reciept.dto';
 import { uuidv7 } from 'uuidv7';
 import { Ticket } from './entity/ticket.entity';
+import { RecieptCheckerService } from 'src/reciept-checker/reciept-checker.service';
 
 @Injectable()
 export class TicketService {
@@ -13,6 +14,7 @@ export class TicketService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly minio: MinioService,
+    private readonly recieptChecker: RecieptCheckerService,
   ) {}
 
   async findAll(filter?: Prisma.TicketWhereInput) {
@@ -128,19 +130,36 @@ export class TicketService {
     );
 
     this.prisma.$transaction(async (tx) => {
+      const rr = (
+        await Promise.all(
+          reciepts.map(async (r) => {
+            const imageUrl = await this.minio.getFileUrl(r.fileName);
+
+            const { info, ok } = await this.recieptChecker.check(imageUrl);
+
+            if (!ok) {
+              this.logger.warn('reciept checker error', { imageUrl, info });
+              this.minio.deleteFile(r.fileName);
+              return null;
+            }
+
+            return {
+              id: r.id,
+              fn: BigInt(info.data.json.fiscalDriveNumber),
+              fp: info.data.json.fiscalSign,
+              amount: info.data.json.totalSum,
+              userId: userId,
+              paidAt: new Date(info.data.json.dateTime),
+              purpose: info.data.json.user ?? 'Неизвестно',
+              imageName: r.fileName,
+              // purpose: info.data.json.items.map(i => i.name).join(', '),
+            };
+          }),
+        )
+      ).filter((r) => r !== null);
+
       await tx.reciept.createMany({
-        data: reciepts.map((r) => {
-          return {
-            id: r.id,
-            fn: 123456789,
-            fp: 123456789,
-            amount: 1337,
-            userId: userId,
-            paidAt: new Date('2024-04-26T22:02:23'),
-            purpose: 'Покупка в MOLOKO',
-            imageName: r.fileName,
-          };
-        }),
+        data: rr,
       });
 
       const t = await tx.ticket.create({
@@ -153,10 +172,10 @@ export class TicketService {
       });
 
       await tx.ticketReciept.createMany({
-        data: reciepts.map((f) => {
+        data: rr.map((r) => {
           return {
             ticketId: t.id,
-            recieptId: f.id,
+            recieptId: r.id,
           };
         }),
       });
