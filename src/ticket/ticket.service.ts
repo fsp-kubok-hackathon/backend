@@ -18,10 +18,26 @@ export class TicketService {
   async findAll(filter?: Prisma.TicketWhereInput) {
     const tickets = await this.prisma.ticket.findMany({
       where: filter,
-      include: { report: { include: { addedBy: true } } },
+      include: { user: true, report: { include: { addedBy: true } } },
     });
 
-    return tickets;
+    const domainTickets: Ticket[] = tickets.map((ticket) => ({
+      id: ticket.id,
+      createdAt: ticket.createdAt,
+      updatedAt: ticket.updatedAt,
+      endDate: ticket.endDate,
+      startDate: ticket.startDate,
+      status: ticket.status,
+      userId: ticket.userId,
+      user: { ...ticket.user, password: undefined },
+      report: ticket.report
+        ? {
+            ...ticket.report,
+          }
+        : undefined,
+    }));
+
+    return domainTickets;
   }
 
   async findAllRecieptsById(ticketId: string) {
@@ -66,7 +82,7 @@ export class TicketService {
           },
         });
 
-        const t = {
+        const t: Ticket = {
           id: ticket.id,
           createdAt: ticket.createdAt,
           updatedAt: ticket.updatedAt,
@@ -77,7 +93,10 @@ export class TicketService {
           user: { ...ticket.user },
           report: ticket.report
             ? {
-                ...ticket.report,
+                ...{
+                  ...ticket.report,
+                  addedBy: { ...ticket.report.addedBy, password: undefined },
+                },
               }
             : undefined,
         };
