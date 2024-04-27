@@ -37,6 +37,7 @@
     "cookie-parser": "^1.4.6",
     "date-fns": "^3.6.0",
     "exceljs": "^4.4.0",
+    "gigachat-node": "^2.1.2",
     "js-sha256": "^0.11.0",
     "minio": "^7.1.3",
     "pg": "^8.11.5",
