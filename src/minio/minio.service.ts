@@ -2,6 +2,7 @@ import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
 import * as Minio from 'minio';
 import { uuidv7 } from 'uuidv7';
 import { getExtension } from 'node-mime-types';
+import { isArray } from 'class-validator';
 @Injectable()
 export class MinioService implements OnModuleInit {
   private readonly client: Minio.Client;
@@ -38,7 +39,8 @@ export class MinioService implements OnModuleInit {
     const id = uuidv7();
     const ext = getExtension(file.mimetype);
 
-    const fileName = id + ext;
+    const fileName = id + (isArray(ext) ? ext[0] : ext);
+    this.logger.verbose('upload: ', { ext, fileName });
 
     this.logger.verbose('uploading a ', { fileName });
     try {
