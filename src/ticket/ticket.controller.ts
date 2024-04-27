@@ -85,12 +85,12 @@ export class TicketController {
   @ApiResponse({ status: 200, type: Ticket })
   async getTicketById(@Param('id') ticketId: string, @User() user: UserClaims) {
     this.logger.verbose('getTicketById', { ticketId });
-    const ticket = await this.service.findById(ticketId);
-    if (user.role === Role.EMPLOYEE && ticket.userId !== user.id) {
+    const res = await this.service.findById(ticketId);
+    if (user.role === Role.EMPLOYEE && res.ticket.userId !== user.id) {
       throw new ForbiddenException('Forbidden');
     }
 
-    return ticket;
+    return res;
   }
 
   @Post('/:id/reciepts')
