@@ -6,6 +6,7 @@ import { UserReciept } from 'src/reciept/dto/reciept.dto';
 import { uuidv7 } from 'uuidv7';
 import { Ticket } from './entity/ticket.entity';
 import { RecieptCheckerService } from 'src/reciept-checker/reciept-checker.service';
+import { RecieptService } from 'src/reciept/reciept.service';
 
 @Injectable()
 export class TicketService {
@@ -15,6 +16,7 @@ export class TicketService {
     private readonly prisma: PrismaService,
     private readonly minio: MinioService,
     private readonly recieptChecker: RecieptCheckerService,
+    private readonly recieptService: RecieptService,
   ) {}
 
   async findAll(filter?: Prisma.TicketWhereInput) {
@@ -143,8 +145,6 @@ export class TicketService {
               return null;
             }
 
-            // TODO передать items
-
             return {
               id: r.id,
               fn: BigInt(info.data.json.fiscalDriveNumber),
@@ -154,24 +154,21 @@ export class TicketService {
               paidAt: new Date(info.data.json.dateTime),
               purpose: info.data.json.user ?? 'Неизвестно',
               imageName: r.fileName,
+              items: info.data.json.items.map((i) => i.name).join('\n'),
               // purpose: info.data.json.items.map(i => i.name).join(', '),
             };
           }),
         )
       ).filter((r) => r !== null);
 
-      let category = await tx.recieptCategory.findFirst({
-        where: { name: 'Прочее' },
-      });
-
-      if (!category) {
-        category = await tx.recieptCategory.create({
-          data: { id: 1, name: 'Прочее' },
-        });
-      }
-
       await tx.reciept.createMany({
-        data: rr.map((r) => ({ ...r, categoryId: category.id })),
+        data: await Promise.all(
+          rr.map(async (r) => ({
+            ...r,
+            items: r.items,
+            categoryId: await this.recieptService.getCategory(r.items),
+          })),
+        ),
       });
 
       const t = await tx.ticket.create({
