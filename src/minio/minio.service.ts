@@ -1,7 +1,7 @@
 import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
 import * as Minio from 'minio';
 import { uuidv7 } from 'uuidv7';
-
+import { getExtension } from 'node-mime-types';
 @Injectable()
 export class MinioService implements OnModuleInit {
   private readonly client: Minio.Client;
@@ -36,9 +36,9 @@ export class MinioService implements OnModuleInit {
     file: Express.Multer.File,
   ): Promise<{ id: string; ext: string; fileName: string }> {
     const id = uuidv7();
-    const ext = file.mimetype.split('/')[1];
+    const ext = getExtension(file.mimetype);
 
-    const fileName = id + '.' + ext;
+    const fileName = id + ext;
 
     this.logger.verbose('uploading a ', { fileName });
     try {
