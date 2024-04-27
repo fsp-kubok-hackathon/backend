@@ -102,15 +102,10 @@ export class ReportService {
       let allIsOk = true;
       for (const item of reportItems) {
         const receipt = reciepts.find((receipt) => {
-          console.log(
-            receipt.paidAt.setMilliseconds(0) ==
-              item.authDate.setMilliseconds(0),
-            receipt.amount.equals(item.sum),
-          );
           return (
             receipt.paidAt.setMilliseconds(0) ===
               item.authDate.setMilliseconds(0) &&
-            item.sum.equals(receipt.amount)
+            item.sum.equals(receipt.totalAmount)
           );
         });
         console.log(receipt);

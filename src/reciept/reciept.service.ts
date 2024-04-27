@@ -26,7 +26,7 @@ export class RecieptService {
         const r = t.reciept;
         const imageLink = await this.minio.getFileUrl(r.imageName);
         const item: UserReciept = {
-          amount: String(r.amount),
+          totalAmount: r.totalAmount.toNumber(),
           fn: String(r.fn),
           fp: String(r.fp),
           paidAt: r.paidAt,
@@ -51,7 +51,7 @@ export class RecieptService {
       reciepts.map(async (t) => {
         const imageLink = await this.minio.getFileUrl(t.imageName);
         const item: UserReciept = {
-          amount: String(t.amount),
+          totalAmount: t.totalAmount.toNumber(),
           fn: String(t.fn),
           fp: String(t.fp),
           paidAt: t.paidAt,
