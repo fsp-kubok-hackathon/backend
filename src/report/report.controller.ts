@@ -44,6 +44,11 @@ export class ReportController {
     return this.reportService.upload(ticketId, file, userId);
   }
 
+  @Post('test/:id')
+  test(@Param('id') id: string) {
+    return this.reportService.validate(id);
+  }
+
   @Get()
   @ApiOperation({})
   @RequiredAuth('ACCOUNTANT')

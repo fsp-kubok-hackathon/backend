@@ -24,7 +24,6 @@ import { UserReciept } from 'src/reciept/dto/reciept.dto';
 import { RecieptService } from 'src/reciept/reciept.service';
 import { Ticket } from './entity/ticket.entity';
 import { Role } from '@prisma/client';
-import { stat } from 'fs';
 import { TicketStatus } from '@prisma/client';
 import { ListFilter } from 'src/decorators/listFilter.decorator';
 
