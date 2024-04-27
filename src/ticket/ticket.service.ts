@@ -73,13 +73,22 @@ export class TicketService {
     return items;
   }
 
-  async findById(ticketId: string): Promise<Ticket> {
+  async findById(ticketId: string): Promise<{
+    ticket: Ticket;
+    categories: {
+      name: string;
+      price: number;
+      maxPrice: number;
+      high: number;
+    }[];
+  }> {
     return this.prisma.$transaction(async (tx) => {
       try {
         const ticket = await tx.ticket.findFirstOrThrow({
           where: { id: ticketId },
           include: {
             user: true,
+            TicketReciept: { include: { reciept: true } },
             report: {
               include: {
                 addedBy: true,
@@ -87,6 +96,40 @@ export class TicketService {
             },
           },
         });
+
+        const rr = ticket.TicketReciept.map((t) => t.reciept);
+        const items = await Promise.all(
+          rr.map(
+            async (r) =>
+              await tx.recieptItem.findFirst({
+                where: { recieptId: r.id },
+                include: { category: true },
+              }),
+          ),
+        );
+        console.log('items length: ', items);
+
+        const categories: {
+          [key: string]: {
+            name: string;
+            price: number;
+            maxPrice: number;
+          };
+        } = {};
+        items.forEach((item) => {
+          if (!categories[item.category.name]) {
+            categories[item.category.name] = {
+              price: item.amount.toNumber(),
+              name: item.category.name,
+              maxPrice: item.category.maxPrice.toNumber() * 100,
+            };
+          } else categories[item.category.name].price += item.amount.toNumber();
+        });
+
+        const values = Object.values(categories).map((c) => ({
+          ...c,
+          high: c.price / c.maxPrice,
+        }));
 
         const t: Ticket = {
           id: ticket.id,
@@ -109,7 +152,7 @@ export class TicketService {
 
         this.logger.verbose('find ticket by id', t);
 
-        return t;
+        return { ticket: t, categories: values };
       } catch (e) {
         this.logger.error('find ticket by id', e);
         throw new NotFoundException('Тикет не найден' + e);
