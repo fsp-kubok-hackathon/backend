@@ -6,6 +6,7 @@ import { PrismaModule } from 'src/prisma/prisma.module';
 import { MinioModule } from 'src/minio/minio.module';
 import { RecieptModule } from 'src/reciept/reciept.module';
 import { RecieptCheckerModule } from 'src/reciept-checker/reciept-checker.module';
+import { ReportModule } from 'src/report/report.module';
 
 @Module({
   controllers: [TicketController],
@@ -17,6 +18,7 @@ import { RecieptCheckerModule } from 'src/reciept-checker/reciept-checker.module
     MinioModule,
     RecieptModule,
     RecieptCheckerModule,
+    ReportModule,
   ],
 })
 export class TicketModule {}

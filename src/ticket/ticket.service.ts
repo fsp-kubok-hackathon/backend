@@ -1,5 +1,5 @@
 import { Injectable, Logger, NotFoundException } from '@nestjs/common';
-import { Prisma } from '@prisma/client';
+import { Prisma, TicketStatus } from '@prisma/client';
 import { MinioService } from 'src/minio/minio.service';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { UserReciept } from 'src/reciept/dto/reciept.dto';
@@ -7,6 +7,7 @@ import { uuidv7 } from 'uuidv7';
 import { Ticket } from './entity/ticket.entity';
 import { RecieptCheckerService } from 'src/reciept-checker/reciept-checker.service';
 import { RecieptService } from 'src/reciept/reciept.service';
+import { ReportService } from 'src/report/report.service';
 
 @Injectable()
 export class TicketService {
@@ -17,6 +18,7 @@ export class TicketService {
     private readonly minio: MinioService,
     private readonly recieptChecker: RecieptCheckerService,
     private readonly recieptService: RecieptService,
+    private readonly reportService: ReportService,
   ) {}
 
   async findAll(filter?: Prisma.TicketWhereInput) {
@@ -166,7 +168,6 @@ export class TicketService {
                   categoryId: await this.recieptService.getCategory(i.name),
                 })),
               ),
-              // purpose: info.data.json.items.map(i => i.name).join(', '),
             };
           }),
         )
@@ -199,6 +200,10 @@ export class TicketService {
         }),
       });
     });
+
+    this.reportService
+      .validate(ticketId ?? id)
+      .then(() => this.logger.verbose('validate report'));
 
     this.logger.verbose('errors', errors);
     return { id, errors };

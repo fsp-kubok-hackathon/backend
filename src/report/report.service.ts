@@ -5,7 +5,7 @@ import Pagination from 'src/shared/pagination';
 import { ReportFilters } from './entities/report.entity';
 import { readToExcel, streamFromUrl } from 'src/utils/excel';
 import { MinioService } from 'src/minio/minio.service';
-import { ReportItem } from '@prisma/client';
+import { ReportItem, TicketStatus } from '@prisma/client';
 
 @Injectable()
 export class ReportService {
@@ -89,6 +89,13 @@ export class ReportService {
         include: { report: true, TicketReciept: true },
       });
 
+      if (!ticket.report) return;
+
+      await tx.ticket.update({
+        where: { id: ticketId },
+        data: { status: TicketStatus.PENDING },
+      });
+
       const reportItems = await tx.reportItem.findMany({
         where: { reportId: ticket.report.id },
       });
@@ -108,7 +115,6 @@ export class ReportService {
             item.sum.equals(receipt.totalAmount)
           );
         });
-        console.log(receipt);
         if (receipt)
           await tx.reportItem.update({
             where: { id: item.id },
@@ -117,11 +123,14 @@ export class ReportService {
         else allIsOk = false;
       }
 
-      if (!allIsOk)
-        tx.ticket.update({
-          where: { id: ticketId },
-          data: { status: 'FAILED' },
-        });
+      const status: TicketStatus = allIsOk
+        ? TicketStatus.OK
+        : TicketStatus.FAILED;
+
+      await tx.ticket.update({
+        where: { id: ticketId },
+        data: { status },
+      });
     });
   }
 
